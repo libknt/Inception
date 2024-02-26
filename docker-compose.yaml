@@ -1,0 +1,82 @@
+---
+version: '3.8'
+
+services:
+  db:
+    container_name: my-mysql
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    restart: always
+    volumes:
+      - ./mysql/db:/var/lib/mysql
+      # - ./mysql/sqls:/docker-entrypoint-initdb.d
+      # - ./log/mysql:/var/log/mysql
+    environment:
+      MYSQL_DATABASE: database
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: password
+      eTZ: Asia/Tokyo
+    stdin_open: true
+  # db:
+  #   container_name: db
+  #   build:
+  #     context: ./mysql
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     # - ./mysql/my.cnf:/etc/mysql/my.cnf
+  #     - ./mysql/db:/var/lib/mysql
+  #   ports:
+  #     - "3306:3306"
+  #   expose:
+  #     - '3306'
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: rootpassword
+  #     MYSQL_DATABASE: wordpress
+  #     MYSQL_USER: wordpress
+  #     MYSQL_PASSWORD: wordpress
+  #   networks:
+  #     - inception-net
+  #   entrypoint: /entrypoint.sh
+  #   restart: always
+
+  web:
+    depends_on:
+      - db
+    container_name: my-nginx
+    volumes:
+      - ./public:/var/www/html
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+    networks:
+      - inception-net
+    entrypoint: /docker-entrypoint.sh
+    restart: always
+
+  wordpress:
+    container_name: my-wordpress
+    volumes:
+      - ./public:/var/www/html
+    build: 
+      context: ./wordpress
+      dockerfile: Dockerfile
+    networks:
+      - inception-net
+    ports:
+      - 9000:9000
+    entrypoint: /entrypoint.sh
+    restart: always
+
+volumes:
+  html:
+    driver: local
+
+networks:
+  inception-net:
+    external: true
