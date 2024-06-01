@@ -1,14 +1,46 @@
 version: '3'
 services:
+  # wordpress:
+  #   build:
+  #     context: ./wordpress
+  #     dockerfile: Dockerfile
+  #   networks:
+  #     frontend:
+  #       aliases:
+  #         - frontend-network
+  #     backend:
+  #       aliases:
+  #         - backend-network
+  #   volumes:
+  #     - web_files:/var/www/html
+  #   environment:
+  #     - USER_ID=${USER_ID}
+  #     - GROUP_ID=${GROUP_ID}
+  #     - WORDPRESS_ADMIN_NAME=${WORDPRESS_ADMIN_NAME}
+  #     - WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}
+  #     - WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL}
+  #     - WORDPRESS_TITLE=${WORDPRESS_TITLE}
+  #     - WORDPRESS_URL=${WORDPRESS_URL}
+  #     - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
+  #     - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
+  #     - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
+  #     - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
+  #     - WORDPRESS_USER_NAME=${WORDPRESS_USER_NAME}
+  #     - WORDPRESS_USER_PASSWORD=${WORDPRESS_USER_PASSWORD}
+  #     - WORDPRESS_USER_EMAIL=${WORDPRESS_USER_EMAIL}
+  #   # depends_on:
+  #   #   mariadb:
+  #   #     condition: service_healthy
+  #   restart: always
+  #   container_name: ${WORDPRESS_CONTAINER_NAME}
+
   mariadb:
-    image: mariadb
     build:
       context: ./db
       dockerfile: Dockerfile
     networks:
       - backend
     volumes:
-      - ./db/tools/my.cnf:/etc/mysql/my.cnf
       - database:/var/lib/docker-mysql
     environment:
       - USER_ID=${USER_ID}
@@ -29,6 +61,8 @@ services:
 networks:
   backend:
     external: true
+  frontend:
+    external: true
   
 
 volumes:
@@ -37,3 +71,8 @@ volumes:
       type: none
       device: ${HOME}/data/mysql
       o: bind
+  # web_files:
+  #   driver_opts:
+  #     type: none
+  #     device: ${HOME}/data/wordpress
+  #     o: bind
