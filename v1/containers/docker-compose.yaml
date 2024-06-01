@@ -1,0 +1,7 @@
+version: '3'
+services:
+  wordperess:
+    image: wordperess
+    build:
+      context: ./wordperess
+      
