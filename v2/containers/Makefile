@@ -1,10 +1,14 @@
 up:
+	mkdir -p ~/data/mysql
+	mkdir -p ~/data/wordpress
 	docker compose up --build
 
 rebuild:
 	docker compose up --build
 	
 down:
+	sudo rm -rf ~/data/mysql
+	sudo rm -rf ~/data/wordpress
 	docker compose down -v
 
 remove:

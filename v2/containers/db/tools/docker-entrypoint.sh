@@ -1,44 +1,24 @@
 #!/bin/bash
-set -ex
 
+mkdir -p /run/mysqld
+adduser mysql
+chown -R mysql:mysql /run/mysqld
 
-if [ "$(id -u)" = "0" ]; then
-	usermod -u ${USER_ID:-1000} -o mysql
-	groupmod -g ${GROUP_ID:-1000} -o mysql
-	mkdir -p /var/lib/docker-mysql/data
-	chown -R mysql:mysql /run/mysqld /var/lib/mysql /docker-entrypoint-initdb.d my.cnf /var/lib/docker-mysql
-	mariadb-install-db --user=mysql --datadir=/var/lib/docker-mysql/data
-	exec gosu mysql ${BASH_SOURCE[0]} "$@"
-fi
-
-
-"$@" --datadir=/var/lib/docker-mysql/data --skip-networking --default-time-zone=SYSTEM --wsrep_on=OFF \
-	--expire-logs-days=0 \
-	--loose-innodb_buffer_pool_load_at_startup=0 &
+mariadbd &
 PID=$!
-
 sleep 5
 
-# if [ -f  /docker/init.sql ]; then
-# 	mysql -e < /docker/init.sql
-# fi
-
-mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
-
-if [ -n ${MYSQL_USER} ] || [ -n ${MYSQL_PASSWORD} ]; then
-	mysql -e "CREATE USER IF NOT EXISTS '${MYSQL_USER:?'ERROR: MYSQL_USER is unset.'}'@'%' IDENTIFIED BY '${MYSQL_PASSWORD:?'ERROR: MYSQL_PASSWORD is unset.'}';"
+sed -i 's/^bind-address\s*=\s*127\.0\.0\.1/bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+if ! mysql -uroot -e ";" ; then
+	mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
 fi
 
-if [ -n ${MYSQL_DATABASE} ]; then
-	mysql -e "CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE}"
-fi
+mysql -uroot -phogehoge -e "CREATE DATABASE IF NOT EXISTS $MYSQL_DATABASE;"
+mysql -uroot -phogehoge -e "CREATE USER IF NOT EXISTS '$MYSQL_USER'@'%' IDENTIFIED BY '$MYSQL_PASSWORD';"
+mysql -uroot -phogehoge -e "GRANT ALL PRIVILEGES ON $MYSQL_DATABASE.* TO '$MYSQL_USER'@'%';"
+mysql -uroot -phogehoge -e "FLUSH PRIVILEGES;"
 
-if [ -n ${MYSQL_USER} ] && [ -n ${MYSQL_PASSWORD} ]; then
-	mysql -e "GRANT ALL PRIVILEGES ON ${MYSQL_DATABASE}.* TO '${MYSQL_USER}'@'%';"
-fi
-mysql -e "FLUSH PRIVILEGES;"
+kill $PID
+wait $PID
 
-kill $!
-wait $!
-exec "$@" --defaults-file=my.cnf
-
+exec "$@"
