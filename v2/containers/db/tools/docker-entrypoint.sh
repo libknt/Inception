@@ -1,5 +1,7 @@
 #!/bin/bash
 set -ex
+
+
 if [ "$(id -u)" = "0" ]; then
 	usermod -u ${USER_ID:-1000} -o mysql
 	groupmod -g ${GROUP_ID:-1000} -o mysql
@@ -9,35 +11,17 @@ if [ "$(id -u)" = "0" ]; then
 	exec gosu mysql ${BASH_SOURCE[0]} "$@"
 fi
 
-if [ ! "$(ls -R /var/lib/docker-mysql/data)" ]; then
-	mariadb-install-db --user=mysql --datadir=/var/lib/docker-mysql/data
-fi
 
 "$@" --datadir=/var/lib/docker-mysql/data --skip-networking --default-time-zone=SYSTEM --wsrep_on=OFF \
 	--expire-logs-days=0 \
 	--loose-innodb_buffer_pool_load_at_startup=0 &
 PID=$!
-count=0
-set +e
-while ! mysqladmin ping -h localhost; do
-	if [ $count -gt 10 ]; then
-		echo "ERROR: cannnot start mariadbd." >&2
-		exit 1
-	fi
-	sleep 1
-	let count=$(count)+1
-	echo "waiting for mariadb daemon is starting..."
-done
-set -e
 
-if [ -f  /docker/init.sql ]; then
-	mysql -e < /docker/init.sql
-fi
+sleep 5
 
-if [ ! -n ${MYSQL_ROOT_PASSWORD} ]; then
-	echo "MYSQL_ROOT_PASSWORD is unset." >&2
-	exit 1
-fi
+# if [ -f  /docker/init.sql ]; then
+# 	mysql -e < /docker/init.sql
+# fi
 
 mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';"
 
