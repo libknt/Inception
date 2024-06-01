@@ -1,0 +1,39 @@
+version: '3'
+services:
+  mariadb:
+    image: mariadb
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    networks:
+      - backend
+    volumes:
+      - ./db/tools/my.cnf:/etc/mysql/my.cnf
+      - database:/var/lib/docker-mysql
+    environment:
+      - USER_ID=${USER_ID}
+      - GROUP_ID=${GROUP_ID}
+      - WORDPRESS_HOST_NAME=${WORDPRESS_CONTAINER_NAME}.${BACKEND_NETWORK_NAME}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 1s
+      timeout: 5s
+      retries: 3
+    restart: always
+    container_name: ${MYSQL_CONTAINER_NAME}
+
+networks:
+  backend:
+    external: true
+  
+
+volumes:
+  database:
+    driver_opts:
+      type: none
+      device: ${HOME}/data/mysql
+      o: bind
