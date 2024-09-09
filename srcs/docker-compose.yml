@@ -34,21 +34,9 @@ services:
           - backend-network
     volumes:
       - web_files:/var/www/html
-    environment:
-      - USER_ID=${USER_ID}
-      - GROUP_ID=${GROUP_ID}
-      - WORDPRESS_ADMIN_NAME=${WORDPRESS_ADMIN_NAME}
-      - WORDPRESS_ADMIN_PASSWORD=${WORDPRESS_ADMIN_PASSWORD}
-      - WORDPRESS_ADMIN_EMAIL=${WORDPRESS_ADMIN_EMAIL}
-      - WORDPRESS_TITLE=${WORDPRESS_TITLE}
-      - WORDPRESS_URL=${WORDPRESS_URL}
-      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST}
-      - WORDPRESS_DB_USER=${WORDPRESS_DB_USER}
-      - WORDPRESS_DB_PASSWORD=${WORDPRESS_DB_PASSWORD}
-      - WORDPRESS_DB_NAME=${WORDPRESS_DB_NAME}
-      - WORDPRESS_USER_NAME=${WORDPRESS_USER_NAME}
-      - WORDPRESS_USER_PASSWORD=${WORDPRESS_USER_PASSWORD}
-      - WORDPRESS_USER_EMAIL=${WORDPRESS_USER_EMAIL}
+      - ./requirements/wordpress/conf/www.conf:/etc/php/7.4/fpm/pool.d/www.conf
+    env_file:
+     - ./.env
     depends_on:
       mariadb:
         condition: service_healthy
@@ -59,7 +47,7 @@ services:
       retries: 3
       start_period: 60s
     restart: always
-    container_name: ${WORDPRESS_CONTAINER_NAME}
+    container_name: wordpress
 
 
   mariadb:
@@ -71,14 +59,8 @@ services:
       - backend
     volumes:
       - database:/var/lib/docker-mysql
-    environment:
-      - USER_ID=${USER_ID}
-      - GROUP_ID=${GROUP_ID}
-      - WORDPRESS_HOST_NAME=${WORDPRESS_CONTAINER_NAME}.${BACKEND_NETWORK_NAME}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    env_file:
+      - ./.env
     healthcheck:
       test: ["CMD-SHELL", "mysql -uuser -pfugafuga -e 'SELECT 1'"]
       interval: 5s
@@ -86,7 +68,7 @@ services:
       retries: 3
       start_period: 60s
     restart: always
-    container_name: ${MYSQL_CONTAINER_NAME}
+    container_name: mariadb
 
 networks:
   backend:
