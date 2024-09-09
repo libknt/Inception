@@ -16,4 +16,4 @@ RUN	mkdir -p /run/php
 RUN	groupadd wordpress && useradd -g wordpress wordpress
 
 ENTRYPOINT	["docker-entrypoint.sh"]
-CMD	["php-fpm7.4", "-F"]
+CMD	["php-fpm7.4", "-F", "-y", "/docker/www.conf"]
