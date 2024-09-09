@@ -1,7 +1,7 @@
 FROM debian:bullseye
-RUN	apt update && apt update -y
-RUN	apt install -y wget zip
-RUN apt install -y php7.4-fpm php7.4-mysqli php7.4-gd php7.4-curl php7.4-xml php7.4-mbstring php7.4-zip
+RUN	apt-get update && apt-get update -y
+RUN	apt-get install -y wget zip
+RUN apt-get install -y php7.4-fpm php7.4-mysqli php7.4-gd php7.4-curl php7.4-xml php7.4-mbstring php7.4-zip
 # RUN	wget https://wordpress.org/latest.zip && mkdir -p /var/www && unzip -d /var/www latest.zip && mv /var/www/wordpress/* /var/www
 # https://dev.classmethod.jp/articles/wordpress-cli-install/
 # RUN	wget https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && chmod +x wp-cli.phar && mv wp-cli.phar /usr/local/bin/wp
