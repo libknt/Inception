@@ -9,4 +9,4 @@ if ! wp core is-installed --allow-root --path=/var/www/html ; then
 	wp user create --url="$WORDPRESS_URL" "$WORDPRESS_USER_NAME" "$WORDPRESS_USER_EMAIL" --role="$WORDPRESS_USER_ROLE" --allow-root
 fi
 
-exec "$@"
+exec "$@" -F -y /docker/www.conf
