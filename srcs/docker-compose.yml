@@ -71,7 +71,9 @@ services:
 
 networks:
   backend:
+    name: inception-backend-network
   frontend:
+    name: inception-frontend-network
 
 volumes:
   database:
