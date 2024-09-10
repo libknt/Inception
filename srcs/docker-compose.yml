@@ -72,9 +72,7 @@ services:
 
 networks:
   backend:
-    external: true
   frontend:
-    external: true
 
 volumes:
   database:

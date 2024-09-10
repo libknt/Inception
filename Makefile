@@ -1,4 +1,4 @@
-SRC		=	docker-compose.yml
+SRC		=	srcs/docker-compose.yml
 all:
 	mkdir -p ${HOME}/data/wordpress ${HOME}/data/mysql
 	docker compose -f ${SRC} up --build
