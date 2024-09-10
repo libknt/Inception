@@ -6,4 +6,6 @@ RUN	apt install -y openssl nginx
 
 COPY ./conf/default.conf /etc/nginx/conf.d/default.conf
 
-CMD	["/usr/sbin/nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/usr/sbin/nginx"]
+
+CMD	["-g", "daemon off;"]

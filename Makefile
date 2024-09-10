@@ -9,3 +9,7 @@ clean:
 	docker compose -f ${SRC} down -v
 fclean: clean
 	rm -rf ${HOME}/data
+
+
+all-remove:
+	docker system prune --all --volumes
