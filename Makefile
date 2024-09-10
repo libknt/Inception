@@ -21,4 +21,16 @@ v:
 all-remove:
 	docker system prune --all --volumes
 
-.PHONY: all build clean fclean ps v all-remove
+logs:
+	docker compose -f ${SRC} logs
+
+restart:
+	docker compose -f ${SRC} restart
+
+stop:
+	docker compose -f ${SRC} stop
+
+start:
+	docker compose -f ${SRC} start
+
+.PHONY: all build clean fclean ps v all-remove logs restart stop start
