@@ -62,7 +62,7 @@ services:
     env_file:
       - ./.env
     healthcheck:
-      test: ["CMD-SHELL", "mysql -uuser -pfugafuga -e 'SELECT 1'"]
+      test: ["CMD-SHELL", "mysql -uuser -ppassword -e 'SELECT 1'"]
       interval: 5s
       timeout: 5s
       retries: 3
