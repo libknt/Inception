@@ -50,7 +50,6 @@ services:
     restart: always
     container_name: wordpress
 
-
   mariadb:
     image: mariadb
     build:
